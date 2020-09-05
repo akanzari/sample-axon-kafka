@@ -28,8 +28,12 @@ import com.axonkafka.services.CatalogService;
 import com.axonkafka.util.HeaderUtil;
 import com.axonkafka.util.ResponseUtil;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
 @RestController
 @RequestMapping(value = "catalogs")
+@Api(tags = { "Operations pertaining to catalogs" })
 public class CatalogController {
 
 	private final CatalogService service;
@@ -45,6 +49,7 @@ public class CatalogController {
 	}
 
 	@PostMapping
+	@ApiOperation(value = "Add a catalog")
 	public ResponseEntity<String> createCatalogAction(@RequestBody @Valid CreateCatalogRequest createCatalogRequest)
 			throws URISyntaxException {
 		String externalId = service.createCatalog(mapper.createCatalogRequestToCatalogDomain(createCatalogRequest));
@@ -55,6 +60,7 @@ public class CatalogController {
 	}
 
 	@PatchMapping
+	@ApiOperation(value = "Update a catalog")
 	public ResponseEntity<Void> updateCatalogAction(@RequestBody @Valid UpdateCatalogRequest updateCatalogRequest) {
 		service.updateCatalog(updateCatalogRequest.getCatalogId(),
 				mapper.updateCatalogRequestToCatalogDomain(updateCatalogRequest));
@@ -63,6 +69,7 @@ public class CatalogController {
 	}
 
 	@PutMapping
+	@ApiOperation(value = "Attach a product to catalog")
 	public ResponseEntity<Void> attachProductAction(@RequestBody @Valid AttachProductRequest attachProductRequest) {
 		service.attachCatalog(attachProductRequest.getCatalogId(),
 				mapper.attachProductRequestToProductDomain(attachProductRequest));
@@ -70,25 +77,29 @@ public class CatalogController {
 				AttachProductRequest.class.getName(), attachProductRequest.getCatalogId())).body(null);
 	}
 
-	@GetMapping
-	public List<Catalog> getAllCatalogs() {
-		return service.getAllCatalogs();
-	}
-
-	@GetMapping("/{catalogId}")
-	public ResponseEntity<Catalog> getCatalog(@PathVariable String catalogId) {
-		Optional<Catalog> catalog = service.getCatalog(catalogId);
-		return ResponseUtil.wrapOrNotFound(catalog);
-	}
-
 	@DeleteMapping("/{catalogId}")
+	@ApiOperation(value = "Delete a catalog")
 	public ResponseEntity<Void> deleteBankAccount(@PathVariable String catalogId) {
 		service.deleteCatalog(catalogId);
 		return ResponseEntity.noContent()
 				.headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, null, catalogId)).build();
 	}
 
+	@GetMapping
+	@ApiOperation(value = "View a list of available catalogs")
+	public List<Catalog> getAllCatalogs() {
+		return service.getAllCatalogs();
+	}
+
+	@GetMapping("/{catalogId}")
+	@ApiOperation(value = "Search a catalog with an ID")
+	public ResponseEntity<Catalog> getCatalog(@PathVariable String catalogId) {
+		Optional<Catalog> catalog = service.getCatalog(catalogId);
+		return ResponseUtil.wrapOrNotFound(catalog);
+	}
+
 	@GetMapping("/events/{catalogId}")
+	@ApiOperation(value = "View a list of events")
 	public List<Object> getEventById(@PathVariable String catalogId) {
 		return service.getEventById(catalogId);
 	}

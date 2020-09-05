@@ -22,7 +22,7 @@ spring:
    datasource:
       url: jdbc:postgresql://127.0.0.1:5432/db
       username: akanzari
-      password: Welcome$01
+      password: akanzari
 server:
   port: 9093
   servlet:
