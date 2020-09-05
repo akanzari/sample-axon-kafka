@@ -1,0 +1,52 @@
+spring:
+   main:
+       allow-bean-definition-overriding: true
+   application:
+      name: axon-producer
+   freemarker:
+      cache: false
+   jpa:
+      hibernate:
+         ddl-auto: create-drop
+      generate-ddl: true
+      properties:
+         hibernate:
+            search:
+              default:
+                directory_provider: filesystem
+                indexBase: ./data/idx
+            dialect: org.hibernate.dialect.PostgreSQL9Dialect
+            jdbc:
+               lob:
+                  non_contextual_creation: true
+   datasource:
+      url: jdbc:postgresql://127.0.0.1:5432/db
+      username: akanzari
+      password: Welcome$01
+server:
+  port: 9093
+  servlet:
+    context-path: /api
+management:
+   endpoints:
+      web:
+         exposure:
+            include:
+            - health
+            - info
+            - monitoring
+axon:
+   #serializer:
+      #general: jackson
+   kafka:
+      client-id: producerservice
+      default-topic: topicx
+      producer:
+         retries: 0
+         bootstrap-servers: localhost:9092
+         event-processor-mode: tracking
+javamelody:
+  enabled: true
+  management-endpoint-monitoring-enabled: true
+  init-parameters:
+    log: true

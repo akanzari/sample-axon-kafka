@@ -1,0 +1,22 @@
+spring:
+   application:
+      name: axon-consumer
+server:
+   port: 9094
+axon:
+   eventhandling:
+      processors:
+         catalogs:
+            source: streamableKafkaMessageSource
+   #serializer:
+      #general: jackson
+   kafka:
+      client-id: consumerservice
+      default-topic: topicx
+      consumer:
+         event-processor-mode: tracking
+         auto-offset-reset: earliest
+         bootstrap-servers:
+         - 127.0.0.1:9092
+   distributed:
+      enabled: true
