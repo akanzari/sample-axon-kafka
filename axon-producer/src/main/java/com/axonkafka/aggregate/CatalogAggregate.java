@@ -1,8 +1,10 @@
 package com.axonkafka.aggregate;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
@@ -28,7 +30,7 @@ import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
-@Aggregate
+@Aggregate(snapshotTriggerDefinition = "catalogSnapshotTrigger")
 @NoArgsConstructor // constructor needed for reconstructing the aggregate
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CatalogAggregate {
@@ -76,8 +78,18 @@ public class CatalogAggregate {
 	@Order(1)
 	protected void on(ProductAttachedEvent evt) {
 		this.catalogId = evt.catalogId;
-		Set<Product> products = this.products;
-		products.add(Product.builder().name(evt.name).description(evt.description).price(evt.price)
+		this.updateProducts(evt);
+	}
+
+	private void updateProducts(ProductAttachedEvent evt) {
+		if (CollectionUtils.isNotEmpty(this.products)) {
+			Optional<Product> productOptional = this.products.stream()
+					.filter((Product product) -> product.getName().equals(evt.name)).findFirst();
+			if (productOptional.isPresent()) {
+				this.products.remove(productOptional.get());
+			}
+		}
+		this.products.add(Product.builder().name(evt.name).description(evt.description).price(evt.price)
 				.quantity(evt.quantity).build());
 	}
 

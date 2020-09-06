@@ -1,8 +1,10 @@
 package com.axonkafka.query.handlers;
 
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.axonframework.eventhandling.EventHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
@@ -59,9 +61,15 @@ public class CatalogQueryHandler {
 	@Transactional(propagation = Propagation.REQUIRED)
 	@Order(2)
 	public void on(ProductAttachedEvent event) {
+		Set<Product> products = new HashSet<>();
 		Catalog catalog = getCatalog(event.catalogId);
-		if (catalog != null) {
-			Set<Product> products = catalog.getProducts();
+		if (catalog != null && CollectionUtils.isNotEmpty(catalog.getProducts())) {
+			products = catalog.getProducts();
+			Optional<Product> productOptional = products.stream()
+					.filter((Product product) -> product.getName().equals(event.name)).findFirst();
+			if (productOptional.isPresent()) {
+				products.remove(productOptional.get());
+			}
 			products.add(Product.builder().name(event.name).description(event.description).price(event.price)
 					.quantity(event.quantity).build());
 			catalog.setProducts(products);
