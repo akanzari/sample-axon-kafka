@@ -3,9 +3,6 @@ package com.axonkafka.config;
 import org.axonframework.commandhandling.CommandBus;
 import org.axonframework.commandhandling.SimpleCommandBus;
 import org.axonframework.common.jpa.EntityManagerProvider;
-import org.axonframework.eventsourcing.EventCountSnapshotTriggerDefinition;
-import org.axonframework.eventsourcing.SnapshotTriggerDefinition;
-import org.axonframework.eventsourcing.Snapshotter;
 import org.axonframework.springboot.autoconfig.AxonAutoConfiguration;
 import org.axonframework.springboot.util.jpa.ContainerManagedEntityManagerProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -20,11 +17,6 @@ import com.axonkafka.interceptors.NameUniquenessCheck;
 @Configuration
 @AutoConfigureAfter(value = { AxonAutoConfiguration.class })
 public class AxonConfig {
-
-	@Bean
-	public SnapshotTriggerDefinition catalogSnapshotTrigger(Snapshotter snapshotter) {
-		return new EventCountSnapshotTriggerDefinition(snapshotter, 3);
-	}
 
 	@Bean
 	@ConditionalOnMissingBean

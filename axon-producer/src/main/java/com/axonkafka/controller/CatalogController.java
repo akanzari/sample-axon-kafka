@@ -104,4 +104,10 @@ public class CatalogController {
 		return service.getEventById(catalogId);
 	}
 
+	@GetMapping("/snapshot/{catalogId}")
+	@ApiOperation(value = "snapshot")
+	public void createSnapshot(@PathVariable String catalogId) {
+		service.createSnapshot(catalogId);
+	}
+
 }

@@ -21,5 +21,7 @@ public interface CatalogService {
 	default Optional<Catalog> getCatalog(String extenalId) { return null; }
 	
 	default List<Object> getEventById(String catalogId) { return null; }
+	
+	default void createSnapshot(String catalogId) { }
 
 }

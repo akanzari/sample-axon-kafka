@@ -7,6 +7,7 @@ import java.util.Set;
 import org.apache.commons.collections4.CollectionUtils;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
+import org.axonframework.eventsourcing.Snapshotter;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateLifecycle;
 import org.axonframework.spring.stereotype.Aggregate;
@@ -15,6 +16,7 @@ import org.springframework.core.annotation.Order;
 import com.axonkafka.commands.AttachProductCommand;
 import com.axonkafka.commands.CreateCatalogCommand;
 import com.axonkafka.commands.DeleteCatalogCommand;
+import com.axonkafka.commands.PerformShapshotCommand;
 import com.axonkafka.commands.UpdateCatalogCommand;
 import com.axonkafka.domain.Product;
 import com.axonkafka.events.CatalogCreatedEvent;
@@ -30,7 +32,7 @@ import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
-@Aggregate(snapshotTriggerDefinition = "catalogSnapshotTrigger")
+@Aggregate
 @NoArgsConstructor // constructor needed for reconstructing the aggregate
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CatalogAggregate {
@@ -102,6 +104,11 @@ public class CatalogAggregate {
 	@Order(1)
 	protected void on(CatalogDeletedEvent evt) {
 		AggregateLifecycle.markDeleted();
+	}
+
+	@CommandHandler
+	public void handle(PerformShapshotCommand cmd, Snapshotter snapshotter) {
+		snapshotter.scheduleSnapshot(this.getClass(), cmd.catalogId);
 	}
 
 }

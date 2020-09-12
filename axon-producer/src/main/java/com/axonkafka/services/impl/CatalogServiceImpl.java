@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.axonkafka.commands.AttachProductCommand;
 import com.axonkafka.commands.CreateCatalogCommand;
 import com.axonkafka.commands.DeleteCatalogCommand;
+import com.axonkafka.commands.PerformShapshotCommand;
 import com.axonkafka.commands.UpdateCatalogCommand;
 import com.axonkafka.domain.Catalog;
 import com.axonkafka.domain.Product;
@@ -72,6 +73,11 @@ public class CatalogServiceImpl implements CatalogService {
 			throw new EntityNotFoundException(Catalog.class, "extenalId", catalogId);
 		}
 		return catalog;
+	}
+
+	@Override
+	public void createSnapshot(String catalogId) {
+		commandGateway.sendAndWait(new PerformShapshotCommand(catalogId));
 	}
 
 	@Override
